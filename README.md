@@ -47,10 +47,6 @@ python app.py
 
 This is a joint traffic flow prediction demonstration framework that combines **event knowledge graph (KG) embedding**, **graph neural network (GNN)** and **time series transformer**.
 
----
-
-
----
 
 ## Core Modules
 
