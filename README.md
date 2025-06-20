@@ -44,9 +44,11 @@ python app.py
 ```
 Get the entities and relations of multiple events to form triples, such as:
 
+```json
 ("crash", "occurred_on", "2024-06-19")
 ("crash", "caused", "road closed")
 ("crash", "happened_at", "State Highway 1 near Seddon")
+```
 
 # Traffic Event-Aware Flow Prediction Framework
 
