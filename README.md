@@ -42,6 +42,11 @@ python app.py
   "source_text": "One person has died following a single-vehicle crash..."
 }
 ```
+Get the entities and relations of multiple events to form triples, such as:
+
+("crash", "occurred_on", "2024-06-19")
+("crash", "caused", "road closed")
+("crash", "happened_at", "State Highway 1 near Seddon")
 
 # Traffic Event-Aware Flow Prediction Framework
 
