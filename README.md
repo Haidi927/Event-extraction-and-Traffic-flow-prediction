@@ -50,26 +50,26 @@ Get the entities and relations of multiple events to form triples, such as:
 ("crash", "happened_at", "State Highway 1 near Seddon")
 ```
 
-# Traffic Event-Aware Flow Prediction Framework
-
-This is a joint traffic flow prediction demonstration framework that combines **event knowledge graph (KG) embedding**, **graph neural network (GNN)** and **time series transformer**.
 
 
-## Core Modules
+## 🧠 Framework Overview: Event KG + GNN + Transformer
 
- Framework Overview: Event KG + GNN + Transformer
-This project proposes a novel traffic flow prediction framework by integrating event knowledge graphs, graph neural networks, and temporal Transformers.
+This project proposes a novel traffic flow prediction framework by integrating **event knowledge graphs**, **graph neural networks**, and **temporal Transformers**. It aims to enhance the robustness and interpretability of traffic prediction in the presence of unexpected events such as accidents, road closures, or extreme weather.
 
-🔗 Step 1: Event Knowledge Graph Construction
+---
+
+### 🔗 Step 1: Event Knowledge Graph Construction
+
 We extract structured semantic triples from traffic-related texts (e.g., news reports, social media) to build an event knowledge graph (KG).
 
-📝 Example
+#### 📝 Example
+
 From the news:
+> "One person died in a crash on State Highway 1 near Seddon, causing the road to be temporarily closed."
 
-"One person died in a crash on State Highway 1 near Seddon, causing the road to be temporarily closed."
+We extract the following triples:
 
-We extract:
-
+```python
 triplets = [
     ("crash", "occurred_on", "2024-06-19"),
     ("crash", "location", "State Highway 1"),
@@ -77,54 +77,90 @@ triplets = [
     ("road_closure", "status", "temporary"),
     ("crash", "casualties", "1_dead")
 ]
+```
 
-🧊 Step 2: TransE Embedding of Event KG
-We use the TransE model to embed each entity and relation into a low-dimensional vector space:
+---
 
-For each triple (h, r, t):
+### 🧊 Step 2: TransE Embedding of Event KG
 
-embedding(h) + embedding(r) ≈ embedding(t)
+We use the **TransE** model to embed each entity and relation into a continuous vector space.
 
-Example:
+> For each triple `(h, r, t)`, TransE aims to learn:
+> ```math
+>     embedding(h) + embedding(r) ≈ embedding(t)
+> ```
 
-embedding("crash")       = [0.8, 0.1, -0.3, 0.2]
-embedding("caused")      = [0.2, 0.3, -0.1, 0.1]
-embedding("road_closure")= [1.0, 0.4, -0.4, 0.3]
+Assume the simplified embeddings:
 
-We construct an event semantic vector by summing or averaging the embeddings of all related triples:
+```text
+embedding("crash")        = [0.8, 0.1, -0.3, 0.2]
+embedding("caused")       = [0.2, 0.3, -0.1, 0.1]
+embedding("road_closure") = [1.0, 0.4, -0.4, 0.3]
+```
 
-event_vec = mean([
-    embed("crash") + embed("occurred_on") + embed("2024-06-19"),
-    embed("crash") + embed("caused") + embed("road_closure"),
-    ...
-])
+We compute an **event semantic vector** by aggregating over all triples:
 
-🛰️ Step 3: Traffic Flow Spatial Encoding (GNN)
-We use real-world sensor data (e.g., METR-LA) to build a road network graph:
+```python
+event_vector_i = embedding(h) + embedding(r) + embedding(t)
+event_vec = mean([event_vector_1, event_vector_2, ..., event_vector_n])
+```
 
-Nodes: traffic sensors
+This `event_vec` captures the semantic meaning of the event and its potential impact on traffic.
 
-Edges: road connectivity
+---
 
-Each node has temporal features (e.g., speed, flow), and is encoded using GCN (Graph Convolutional Network):
+### 🛰️ Step 3: Traffic Flow Spatial Encoding (GNN)
 
+We use real-world traffic sensor data (e.g., from METR-LA) and model the road network as a graph:
+
+- **Nodes**: traffic sensors
+- **Edges**: adjacency based on road topology
+- **Features**: traffic speed, volume, and occupancy at each time step
+
+We apply a **GCN (Graph Convolutional Network)** to model spatial dependencies:
+
+```python
 GNN_output_t1, GNN_output_t2, ..., GNN_output_tn
+```
 
-⏳ Step 4: Temporal Prediction (Transformer) + Event Fusion
-We concatenate the event vector with each time step's GCN output:
+Each `GNN_output_tx` is a feature embedding for all nodes at time `t`.
 
+---
+
+### ⏳ Step 4: Temporal Prediction with Transformer + Event Fusion
+
+We **fuse event information** with GCN spatial features by concatenation:
+
+```python
 input_t1 = concat(GNN_output_t1, event_vec)
 input_t2 = concat(GNN_output_t2, event_vec)
 ...
 input_tn = concat(GNN_output_tn, event_vec)
+```
 
-Then feed into a Transformer for time series modeling:
+We feed the sequence into a **Transformer** to capture temporal dependencies:
 
-prediction = Transformer([input_t1, ..., input_tn])
+```python
+prediction = Transformer([input_t1, input_t2, ..., input_tn])
+```
 
-🔁 Final Output
-The Transformer outputs the predicted traffic flow (speed / volume) for future time steps, with enhanced robustness to unexpected events.
 ---
+
+### 🔮 Output
+
+The Transformer outputs predicted traffic conditions (speed/flow) at future time points. By including real-world event information, the model can adapt to emergencies and provide more reliable forecasts.
+
+---
+
+### 📌 Text-based Framework Diagram
+
+```
+[Text] → [Event Triples] → [Event KG] → [TransE] → 🧩 event_vec
+                                         ↓
+[Sensor Graph + Features] → [GNN] → [GNN_output_t1, ..., tn]
+                                         ↓
+   [GNN_output_tx + event_vec] → [Transformer] → [Predicted Flow Values]
+```
 
 ## Project Structure
 
