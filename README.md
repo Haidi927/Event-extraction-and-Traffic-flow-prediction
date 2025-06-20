@@ -45,7 +45,7 @@ python app.py
 
 # Traffic Event-Aware Flow Prediction Framework
 
-这是一个结合**事件知识图谱（Knowledge Graph, KG）嵌入**、**路网图神经网络（Graph Neural Network, GNN）**与**时序Transformer**的联合交通流预测示范框架。
+This is a joint traffic flow prediction demonstration framework that combines **event knowledge graph (KG) embedding**, **graph neural network (GNN)** and **time series transformer**.
 
 ---
 
@@ -85,16 +85,28 @@ python app.py
 
 traffic-event-prediction/
 ├── data/ # Store traffic flow data, event triples and road network structure
+
 ├── kg/ # Event knowledge graph construction and TransE embedding
+
 │ ├── transE.py # TransE model implementation
+
 │ ├── utils.py # Entity relationship mapping and tool functions
+
 │ ├── embed_event.py # Event vector generation
+
 ├── model/ # GNN and Transformer model
+
 │ ├── gnn.py # Road network graph neural network
+
 │ ├── transformer.py # Transformer encoder module
+
 │ ├── predictor.py # Joint prediction model (event embedding + GNN + Transformer)
+
 ├── train.py # Main training script
+
 ├── evaluate.py # Model evaluation script
+
 ├── requirements.txt # Dependency package list
+
 ├── README.md # Project description document
 
