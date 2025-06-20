@@ -10,22 +10,22 @@ class MetrLaDataset(Dataset):
     def __init__(self, h5_file, edge_index_file, event_triplet_file,
                  entity2id, relation2id, seq_len=12, pred_len=3, split='train'):
         """
-        h5_file: METR-LA traffic data
-        edge_index_file: adjacency info
-        event_triplet_file: knowledge triples
+        h5_file: 存储交通流数据
+        edge_index_file: 路网边连接 npy
+        event_triplet_file: 每个样本对应的事件三元组（JSON）
         """
         with h5py.File(h5_file, 'r') as f:
             self.data = f['df'][:].astype(np.float32)  # shape (T, N)
         self.num_nodes = self.data.shape[1]
 
-        # Normalize
+        # 标准化
         self.scaler = StandardScaler()
         self.data = self.scaler.fit_transform(self.data)
 
         self.seq_len = seq_len
         self.pred_len = pred_len
 
-        # Data split
+        # 数据划分
         T = self.data.shape[0]
         train_end = int(T * 0.7)
         val_end = int(T * 0.9)
@@ -36,10 +36,10 @@ class MetrLaDataset(Dataset):
         else:
             self.indices = range(val_end, T - seq_len - pred_len)
 
-        # Load graph edges
-        self.edge_index = torch.LongTensor(np.load(edge_index_file))
+        # 路网边连接
+        self.edge_index = torch.LongTensor(np.load(edge_index_file))  # shape (2, E)
 
-        # Load event triples
+        # 加载事件知识图谱
         with open(event_triplet_file, 'r') as f:
             self.event_data = json.load(f)
 
@@ -51,7 +51,7 @@ class MetrLaDataset(Dataset):
 
     def encode_event_triplets(self, triplets):
         """
-        Convert triplets to ID format
+        将事件三元组编码为 (head_id, relation_id, tail_id) 格式
         """
         encoded = []
         for h, r, t in triplets:
@@ -63,16 +63,16 @@ class MetrLaDataset(Dataset):
 
     def __getitem__(self, idx):
         i = self.indices[idx]
-        seq_x = self.data[i:i+self.seq_len]  # (seq_len, num_nodes)
+        seq_x = self.data[i:i+self.seq_len]         # (seq_len, num_nodes)
         seq_y = self.data[i+self.seq_len:i+self.seq_len+self.pred_len]  # (pred_len, num_nodes)
 
-        # Get associated event triplets
-        event_triplets = self.event_data.get(str(i), [])
+        # 获取事件 triplets
+        event_triplets = self.event_data[str(i)]  # 假设键为字符串形式的样本位置
         encoded_triplets = self.encode_event_triplets(event_triplets)
 
         return (
-            torch.FloatTensor(seq_x),
-            torch.FloatTensor(seq_y),
-            torch.LongTensor(encoded_triplets),
-            self.edge_index
+            torch.FloatTensor(seq_x),        # traffic_x: (seq_len, num_nodes)
+            torch.FloatTensor(seq_y),        # traffic_y: (pred_len, num_nodes)
+            torch.LongTensor(encoded_triplets),  # (num_triplets, 3)
+            self.edge_index                  # (2, E)
         )
