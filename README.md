@@ -54,8 +54,7 @@ prompt = PromptTemplate(
 
 ```
 ### ✅ LLMChain 调用示例
-```json
-{
+
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import LLMChain
 
@@ -65,8 +64,7 @@ chain = LLMChain(prompt=prompt, llm=llm)
 text = "One person has died in a single-vehicle crash on State Highway 1 near Seddon. The road is closed until further notice."
 result = chain.run(text=text)
 print(result)
-}
-```
+
 
 ### ✅ Output Example
 
