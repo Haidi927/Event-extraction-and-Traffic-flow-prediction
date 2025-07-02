@@ -6,11 +6,16 @@ Traditional traffic flow prediction mostly relies on historical traffic data, ig
 
 A LangChain-based demo to extract structured traffic events from news articles using OpenAI GPT.
 
-## 📌 Features
+## 📌 
+🔧 技术栈
+💬 大语言模型：OpenAI GPT-4
 
-- Crawl traffic news from a given URL
-- Extract structured incident information (type, location, casualties, impact)
-- Output clean JSON for downstream KG / prediction tasks
+
+🔗 框架：LangChain（Prompt 管理 + LLMChain + OutputParser）
+
+🧱 结构化输出：JSON → 三元组
+
+📊 下游任务：事件知识图谱构建 / GNN-Transformer 联合建模
 
 ## 🏁 Quick Start
 
@@ -25,9 +30,28 @@ Create a `.env` file or use export:
 export OPENAI_API_KEY=your-api-key
 ```
 
-### 3. Run the extractor
+### 3.  Prompt 示例
 ```bash
-python app.py
+from langchain.prompts import PromptTemplate
+
+prompt = PromptTemplate(
+    input_variables=["text"],
+    template="""
+你是一个交通信息抽取助手，请从以下文本中提取交通事件的结构化信息，并返回 JSON 格式：
+
+{text}
+
+输出字段包括：
+- event_type（事故、封路等）
+- date（发生日期）
+- location（地点）
+- impact（如封路、延误）
+- casualties（人员伤亡）
+
+如果没有某些字段，返回空值。
+"""
+)
+
 ```
 
 ### ✅ Output Example
