@@ -37,24 +37,27 @@ from langchain.prompts import PromptTemplate
 prompt = PromptTemplate(
     input_variables=["text"],
     template="""
-你是一个交通信息抽取助手，请从以下文本中提取交通事件的结构化信息，并返回 JSON 格式：
+You are a traffic event extraction assistant. Please extract structured traffic event information from the following text and return it in JSON format:
 
 {text}
 
-输出字段包括：
-- event_type（事故、封路等）
-- date（发生日期）
-- location（地点）
-- impact（如封路、延误）
-- casualties（人员伤亡）
+Output fields include:
+- event_type (e.g., crash, road closure, etc.)
+- date (date of occurrence)
+- location (location)
+- impact (e.g., road closure, delays)
+- casualties (number of casualties)
 
-如果没有某些字段，返回空值。
+If any fields are missing, return an empty value.
+"""
+)
+
 """
 )
 
 ```
 ### ✅ LLMChain 调用示例
-
+```bash
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import LLMChain
 
@@ -64,7 +67,7 @@ chain = LLMChain(prompt=prompt, llm=llm)
 text = "One person has died in a single-vehicle crash on State Highway 1 near Seddon. The road is closed until further notice."
 result = chain.run(text=text)
 print(result)
-
+```
 
 ### ✅ Output Example
 
