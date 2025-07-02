@@ -52,8 +52,6 @@ If any fields are missing, return an empty value.
 """
 )
 
-"""
-)
 
 ```
 ### ✅ LLMChain 调用示例
